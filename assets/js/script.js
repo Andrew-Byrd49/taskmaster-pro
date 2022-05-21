@@ -2,10 +2,8 @@ var tasks = {};
 
 var auditTask = function(taskEl) {
   var date = $(taskEl).find("span").text().trim();
-  console.log(date);
 
   var time = moment(date, "L").set("hour", 17);
-  console.log(time);
 
   $(taskEl).removeClass("list-groupitem-warning list-group-item-danger");
 
@@ -204,17 +202,19 @@ $(".card .list-group").sortable({
   scroll: false,
   tolerance: "pointer",
   helper: "clone",
-  active: function(event) {
-    console.log("activate", this);
+  activate: function(event) {
+    $(this).addClass(".dropover");
+    $(".bottom-trash").addClass("bottom-trash-drag");
   },
   deactivate: function(event) {
-    console.log("deactivate", this);
+    $(this).removeClass("dropover");
+    $(".bottom-trash").removeClass("bottom-trash-drag");
   },
   over: function(event) {
-    console.log("over", event.target);
+    $(this).addClass("dropover-active");
   },
   out: function(event) {
-    console.log("out", event.target);
+    $(this).removeClass("dropover-active");
   },
   update: function(event) {
     var tempArr = [];
@@ -243,8 +243,6 @@ $(".card .list-group").sortable({
 
     tasks[arrName] = tempArr;
     saveTasks();
-
-    console.log(tempArr);
   }
 });
 
@@ -252,17 +250,23 @@ $("#trash").droppable({
   accept: ".card .list-group-item",
   tolerance: "touch",
   drop: function(event, ui) {
-    console.log("drop");
     ui.draggable.remove();
+    $(".bottom-trash").removeClass("bottom-trash-active");
   },
   over: function(event, ui) {
-    console.log("over");
+    $(".bottom-trash").addClass("bottom-trash-active");
   },
   out: function(event, ui) {
-    console.log("out");
+    $(".bottom-trash").removeClass("bottom-trash-active");
   }
 });
 
 $("#modalDueDate").datepicker({
   minDate: 1
 });
+
+setInterval(function() {
+  $(".card .list-group-item").each(function(index, el) {
+    auditTask(el);
+  });
+}, 1800000);
